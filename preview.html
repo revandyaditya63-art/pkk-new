@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Together Store | Marketplace & Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #0056b3;
+            --primary-light: #e7f1ff;
+            --secondary: #003d80;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --price-color: #ee4d2d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navbar */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .logo-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: white;
+            padding: 5px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            display: flex;
+            background: white;
+            border-radius: 6px;
+            padding: 2px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            padding: 8px 15px;
+            outline: none;
+            font-size: 0.95rem;
+        }
+
+        .search-btn {
+            background-color: var(--primary);
+            border: none;
+            color: white;
+            padding: 0 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            font-size: 1.1rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .nav-link.active {
+            border-bottom: 2px solid white;
+            padding-bottom: 3px;
+        }
+
+        /* General Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 30px;
+            padding-top: 30px;
+        }
+
+        /* Views Control */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sidebar UI */
+        aside {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .filter-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .filter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            margin-bottom: 15px;
+        }
+
+        .filter-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .filter-content label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-content label:hover {
+            color: var(--primary);
+        }
+
+        .filter-content input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .product-img-wrapper {
+            position: relative;
+            padding-top: 100%;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .product-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .product-card:hover .product-img {
+            transform: scale(1.08);
+        }
+
+        .product-info {
+            padding: 18px;
+            border-top: 1px solid #f9f9f9;
+        }
+
+        .product-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            height: 2.8rem;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .product-price-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .product-price {
+            color: var(--price-color);
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .product-card-likes {
+            background: #fff5f5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .product-meta {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .product-rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #555;
+        }
+
+        .product-rating i {
+            color: #f59e0b;
+            /* Gold star */
+        }
+
+        .product-location {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 65%;
+        }
+
+        .product-location i {
+            color: var(--text-muted);
+        }
+
+        /* Product Detail */
+        .detail-wrapper {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            display: grid;
+            grid-template-columns: 500px 1fr;
+            gap: 50px;
+            box-shadow: var(--shadow);
+            border: 1px solid #eee;
+        }
+
+        .detail-img-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+            background: #fff;
+        }
+
+        .detail-img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: contain;
+        }
+
+        .detail-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .like-btn-big {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff5f5;
+            color: var(--danger);
+            border: 1px solid #ffd8d8;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .like-btn-big.active {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .price-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #fffcfb;
+            border-radius: 8px;
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: auto;
+        }
+
+        /* Comments Styling */
+        .comment-section {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            margin-top: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid #eee;
+        }
+
+        .comment-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid #f8f9fa;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .comment-input-area {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .comment-input-area img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment-box {
+            flex: 1;
+            background: #f8f9fa;
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 15px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .comment-box:focus-within {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .comment-box textarea {
+            width: 100%;
+            border: none;
+            background: transparent;
+            outline: none;
+            resize: none;
+            font-family: inherit;
+            font-size: 1rem;
+            min-height: 50px;
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            transition: 0.3s;
+        }
+
+        .send-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .upload-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 55px;
+            bottom: 12px;
+            transition: 0.3s;
+        }
+
+        .upload-btn:hover {
+            color: var(--primary);
+            background: #f0f4f8;
+        }
+
+        .upload-preview-container {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .preview-img-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-preview {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .comment-image-attachment {
+            margin-top: 12px;
+            max-width: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .comment-image-attachment:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment-image-attachment img {
+            width: 100%;
+            display: block;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .comment-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .comment-content {
+            flex: 1;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 0 20px 20px 20px;
+            border: 1px solid #eee;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .comment-item:hover .comment-content {
+            background: #fcfdfe;
+            border-color: var(--primary-light);
+        }
+
+        .comment-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+            color: var(--primary);
+        }
+
+        .comment-text {
+            font-size: 1rem;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .comment-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .comment-action {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .comment-action:hover {
+            color: var(--primary);
+        }
+
+        .comment-action.like.active {
+            color: var(--danger);
+        }
+
+        .comment-replies {
+            margin-left: 55px;
+            margin-top: 15px;
+            border-left: 2px solid #eee;
+            padding-left: 20px;
+        }
+
+        .comment-reply-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .comment-reply-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .comment-reply-item .comment-avatar {
+            width: 35px;
+            height: 35px;
+            box-shadow: none;
+        }
+
+        .comment-reply-item .comment-content {
+            padding: 12px 15px;
+            border-radius: 0 16px 16px 16px;
+            font-size: 0.95rem;
+        }
+
+        .reply-input-wrapper {
+            margin-left: 55px;
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .reply-input-box {
+            flex: 1;
+            background: #fff;
+            border: 1px solid var(--primary-light);
+            border-radius: 20px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .reply-input-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .reply-send-btn {
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            transition: 0.2s;
+        }
+
+        .reply-send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Status & Buttons */
+        .btn {
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 86, 179, 0.3);
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-light);
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 25px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (max-width: 1000px) {
+
+            .main-layout,
+            .detail-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-img-container {
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Checkout View */
+        .checkout-wrapper {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid #eee;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .checkout-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .checkout-header i {
+            cursor: pointer;
+            color: var(--text-main);
+            font-size: 1.3rem;
+        }
+
+        .checkout-product {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .checkout-product img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        .checkout-product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .checkout-product-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .checkout-price-qty {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .checkout-price {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .qty-btn {
+            background: #f8f9fa;
+            border: none;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:hover {
+            background: #e9ecef;
+        }
+
+        .qty-input {
+            width: 40px;
+            height: 28px;
+            border: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .checkout-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.95rem;
+        }
+
+        .checkout-row .label {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .checkout-row .value {
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkout-row .free-badge {
+            color: var(--danger);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .payment-method-selector {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            background: #fafafa;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .payment-option:hover {
+            background: #f0f0f0;
+        }
+
+        .payment-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .payment-option input[type="radio"] {
+            margin-right: 15px;
+            accent-color: var(--primary);
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .payment-logo {
+            height: 20px;
+            width: auto;
+            margin-right: 12px;
+            object-fit: contain;
+        }
+
+        .payment-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .checkout-footer {
+            margin-top: 30px;
+        }
+
+        .checkout-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkout-total-label {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .checkout-total-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .checkout-disclaimer {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .btn-place-order {
+            background: #ff3e4e;
+            color: white;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-place-order:hover {
+            background: #e62c3b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 62, 78, 0.3);
+        }
+
+        /* Receipt View */
+        .receipt-wrapper {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #eee;
+            max-width: 500px;
+            margin: 40px auto;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .receipt-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), #00c6ff);
+        }
+
+        .success-icon {
+            width: 70px;
+            height: 70px;
+            background: #d4edda;
+            color: #28a745;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .receipt-header h2 {
+            color: var(--text-main);
+            font-weight: 800;
+            margin-bottom: 5px;
+            font-size: 1.6rem;
+        }
+
+        .receipt-date {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .receipt-body {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: left;
+            border: 1px dashed #ddd;
+        }
+
+        .receipt-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .detail-label {
+            color: var(--text-muted);
+        }
+
+        .detail-value {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .detail-value.highlight {
+            color: var(--primary);
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+
+        .receipt-divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 20px 0;
+        }
+
+        .receipt-product {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .receipt-product img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 1px solid #eee;
+        }
+
+        .receipt-product-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .receipt-product-qty {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Login Modal View */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .login-card {
+            background: white;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(20px);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .modal-overlay.active .login-card {
+            transform: translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .social-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .social-login-btn:hover {
+            background: #f8f9fa;
+            border-color: #d0d0d0;
+        }
+
+        .social-login-btn img {
+            width: 22px;
+            height: 22px;
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 25px 0;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #eee;
+        }
+
+        .login-divider span {
+            padding: 0 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 86, 179, 0.3);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            width: 250px;
+            padding: 10px 0;
+            border: 1px solid #eee;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: 0.2s ease;
+            z-index: 100;
+        }
+
+        .profile-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dropdown-header img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .dropdown-header h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .dropdown-header p {
+            margin: 2px 0 0 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 5px 0;
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+        }
+
+        .dropdown-item i {
+            color: var(--text-muted);
+            width: 16px;
+        }
+
+        .dropdown-item.text-danger {
+            color: var(--danger);
+        }
+
+        .dropdown-item.text-danger i {
+            color: var(--danger);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container nav-content">
+            <div class="logo-section" onclick="switchView('marketplace')">
+                <img src="./public/assets/logo.png" alt="Together Store" class="logo-img">
+                <span>Together Store</span>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Cari produk impianmu...">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="nav-actions">
+                <span class="nav-link active" onclick="switchView('marketplace')">Beranda</span>
+                <span class="nav-link" onclick="switchView('dashboard')">Seller</span>
+                <i class="fas fa-shopping-bag" style="cursor: pointer;"></i>
+
+                <div class="profile-container" style="position: relative;">
+                    <div id="userProfileIcon" style="cursor: pointer;" onclick="handleProfileClick()">
+                        <i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profileDropdown" class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <img src="" id="dropdownAvatar" alt="Avatar">
+                            <div>
+                                <h4 id="dropdownName">User</h4>
+                                <p id="dropdownEmail">user@example.com</p>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-cog"></i> Pengaturan
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-box"></i> Pesanan Saya
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item text-danger" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i> Log Out
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Marketplace View -->
+        <div id="marketplaceView" class="view active">
+            <div class="main-layout">
+                <aside>
+                    <div class="filter-card">
+                        <div class="filter-header">
+                            <h4>Kategori</h4> <i class="fas fa-chevron-up"></i>
+                        </div>
+                        <div class="filter-content">
+                            <label><input type="checkbox" checked onclick="filterByCategory('Semua Produk')"> Semua
+                                Produk</label>
+                            <label><input type="checkbox" onclick="filterByCategory('Alas Kaki')"> Alas Kaki</label>
+                            <label><input type="checkbox" onclick="filterByCategory('Fashion Pria')"> Fashion
+                                Pria</label>
+                            <label><input type="checkbox" onclick="filterByCategory('Elektronik')"> Elektronik</label>
+                            <label><input type="checkbox" onclick="filterByCategory('Aksesoris')"> Aksesoris</label>
+                        </div>
+                    </div>
+                </aside>
+                <div class="product-grid" id="productGrid"></div>
+            </div>
+        </div>
+
+        <!-- Detail View -->
+        <div id="productDetailView" class="view">
+            <div class="nav-back" onclick="switchView('marketplace')"><i class="fas fa-chevron-left"></i> Kembali ke
+                Beranda</div>
+            <div id="detailContent"></div>
+
+            <!-- Comment Section -->
+            <div class="comment-section">
+                <div class="comment-header">
+                    <h3 id="commentCount">Komentar Pembeli (0)</h3>
+                    <div style="font-weight: 600; color: var(--text-muted); cursor: pointer;">Terbaru <i
+                            class="fas fa-sort-amount-down"></i></div>
+                </div>
+
+                <div class="comment-input-area">
+                    <img src="https://ui-avatars.com/api/?name=User+Together&background=0056b3&color=fff"
+                        alt="User Avatar" class="comment-avatar">
+                    <div class="comment-box">
+                        <textarea id="commentInput"
+                            placeholder="Ceritakan pengalamanmu dengan produk ini..."></textarea>
+
+                        <div id="commentUploadPreview" class="upload-preview-container"></div>
+
+                        <input type="file" id="commentImageInput" style="display: none;" accept="image/*"
+                            onchange="handleImageSelect(event, 'commentUploadPreview')">
+
+                        <button class="upload-btn" onclick="document.getElementById('commentImageInput').click()"
+                            title="Tambah Gambar">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="send-btn" onclick="postComment()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+
+                <div class="comment-list" id="commentList"></div>
+            </div>
+        </div>
+
+        <!-- Checkout View -->
+        <div id="checkoutView" class="view">
+            <div class="checkout-wrapper">
+                <div class="checkout-header">
+                    <i class="fas fa-arrow-left" onclick="switchView('productDetail')"></i>
+                    <span>Order Summary</span>
+                </div>
+
+                <div class="checkout-product" id="checkoutProductDetails">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="checkout-row">
+                    <div class="label">Standard shipping</div>
+                    <div class="value">
+                        <div style="text-align: right;">
+                            <div class="free-badge"><i class="fas fa-truck"></i> Free</div>
+                            <div style="font-size: 0.8rem; margin-top: 4px;">Delivery by Tomorrow</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-row" style="cursor: pointer;">
+                    <div class="label">Message</div>
+                    <div class="value">Optional <i class="fas fa-chevron-right" style="font-size: 0.8rem;"></i></div>
+                </div>
+
+                <div style="margin-top: 25px;">
+                    <div class="label" style="font-weight: 600; font-size: 1.05rem; margin-bottom: 10px;">Payment method
+                    </div>
+
+                    <div class="payment-method-selector">
+                        <label class="payment-option selected" tabindex="0">
+                            <input type="radio" name="payment" value="GoPay" checked>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"
+                                class="payment-logo">
+                            <span class="payment-name">GoPay</span>
+                        </label>
+                        <label class="payment-option" tabindex="0">
+                            <input type="radio" name="payment" value="DANA">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"
+                                class="payment-logo" style="height: 18px;">
+                            <span class="payment-name">DANA</span>
+                        </label>
+                        <label class="payment-option" tabindex="0">
+                            <input type="radio" name="payment" value="OVO">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"
+                                class="payment-logo" style="height: 18px;">
+                            <span class="payment-name">OVO</span>
+                        </label>
+                        <label class="payment-option" tabindex="0">
+                            <input type="radio" name="payment" value="ShopeePay">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee_logo.svg"
+                                alt="ShopeePay" class="payment-logo" style="height: 22px;">
+                            <span class="payment-name">ShopeePay</span>
+                        </label>
+                        <label class="payment-option" tabindex="0">
+                            <input type="radio" name="payment" value="BCA Virtual Account">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg"
+                                alt="BCA" class="payment-logo" style="height: 16px;">
+                            <span class="payment-name">BCA Virtual Account</span>
+                        </label>
+                        <label class="payment-option" tabindex="0">
+                            <input type="radio" name="payment" value="Cash on Delivery (COD)">
+                            <i class="fas fa-money-bill-wave"
+                                style="color: #28a745; font-size: 1.2rem; margin-right: 12px; width: 20px; text-align: center;"></i>
+                            <span class="payment-name">Cash on Delivery (COD)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="checkout-footer">
+                    <div class="checkout-disclaimer">
+                        By placing an order, you acknowledge that you have read the <strong>Terms of Service</strong>
+                        and <strong>Privacy Policy</strong> of Together Store. Payment will be processed securely.
+                    </div>
+
+                    <div class="checkout-total-row">
+                        <div class="checkout-total-label">Total</div>
+                        <div class="checkout-total-value" id="checkoutTotalPrice">Rp 0</div>
+                    </div>
+
+                    <button class="btn-place-order" onclick="placeOrder()">Place order</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt View -->
+        <div id="receiptView" class="view">
+            <div class="receipt-wrapper">
+                <div class="receipt-header">
+                    <div class="success-icon"><i class="fas fa-check"></i></div>
+                    <h2>Payment Successful!</h2>
+                    <p class="receipt-date" id="receiptDate">13 Mar 2026, 08:50 WIB</p>
+                </div>
+
+                <div class="receipt-body">
+                    <div class="receipt-detail-row">
+                        <span class="detail-label">Total Payment</span>
+                        <span class="detail-value highlight" id="receiptTotal">Rp 0</span>
+                    </div>
+                    <div class="receipt-detail-row">
+                        <span class="detail-label">Payment Method</span>
+                        <span class="detail-value" id="receiptMethod">GoPay</span>
+                    </div>
+                    <div class="receipt-detail-row">
+                        <span class="detail-label">Transaction ID</span>
+                        <span class="detail-value" id="receiptId">TRX-000000</span>
+                    </div>
+
+                    <div class="receipt-divider"></div>
+
+                    <div class="receipt-product">
+                        <img src="" id="receiptImg" alt="Product">
+                        <div class="receipt-product-info">
+                            <div class="receipt-product-name" id="receiptName">Product Name</div>
+                            <div class="receipt-product-qty">Qty: <span id="receiptQty">1</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-outline" style="width: 100%; margin-top: 25px;"
+                    onclick="switchView('marketplace')">Kembali Belanja</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Placeholder -->
+        <div id="dashboardView" class="view">
+            <div style="text-align:center; padding:100px;">
+                <i class="fas fa-tools" style="font-size:4rem; color:var(--primary); margin-bottom:20px;"></i>
+                <h2>Seller Dashboard Sedang Maintenance</h2>
+                <p>Fitur ini akan segera kembali.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Login Overlay -->
+    <div class="modal-overlay" id="customLoginModal">
+        <div class="login-card">
+            <i class="fas fa-times close-modal" onclick="closeLoginModal()"></i>
+
+            <div class="login-header">
+                <h2>Welcome Back</h2>
+                <p>Silakan masuk ke akun Anda</p>
+            </div>
+
+            <button class="social-login-btn" onclick="selectLoginMethod('Google')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google">
+                Lanjutkan dengan Google
+            </button>
+            <button class="social-login-btn" onclick="selectLoginMethod('Facebook')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png"
+                    alt="Facebook">
+                Lanjutkan dengan Facebook
+            </button>
+            <button class="social-login-btn" onclick="selectLoginMethod('Apple')">
+                <i class="fab fa-apple" style="font-size: 1.4rem; color: black;"></i>
+                Lanjutkan dengan Apple
+            </button>
+
+            <div id="loginFormArea" style="display: none; animation: fadeIn 0.4s ease;">
+                <div class="login-divider">
+                    <span id="loginMethodLabel">LOG IN DENGAN EMAIL</span>
+                </div>
+
+                <form onsubmit="event.preventDefault(); submitLogin();">
+                    <div class="form-group">
+                        <label for="loginEmail">Email / Username</label>
+                        <input type="text" id="loginEmail" placeholder="Masukkan email Anda" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Masukkan sandi Anda" required>
+                    </div>
+                    <button type="submit" class="btn-login">Sign In</button>
+                </form>
+            </div>
+
+            <p style="text-align: center; margin-top: 25px; font-size: 0.9rem; color: var(--text-muted);">
+                Belum punya akun? <a href="#"
+                    style="color: var(--primary); font-weight: 700; text-decoration: none;">Daftar Sekarang</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let products = [
+            { id: 1, name: 'Sandal Sporty Premium Blue Edition', category: 'Alas Kaki', price: 150000, image: './public/assets/product-1.png', likes: 142, isLiked: false, rating: 4.8, location: 'Jakarta Selatan', comments: [] },
+            { id: 2, name: 'Sepatu Fashion Pria Elegant Blue', category: 'Alas Kaki', price: 350000, image: './public/assets/product-2.png', likes: 215, isLiked: false, rating: 4.9, location: 'Bandung', comments: [] },
+            { id: 3, name: 'Polo Shirt Premium Blue Comfort', category: 'Fashion Pria', price: 185000, image: './brain/6c5142a1-90b7-4827-b6bf-0404e915e29f/polo_shirt_blue_1773331868709.png', likes: 98, isLiked: false, rating: 4.7, location: 'Surabaya', comments: [] },
+            { id: 4, name: 'Luxury Blue Wrist Watch Special', category: 'Aksesoris', price: 1250000, image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=500&q=80', likes: 450, isLiked: false, rating: 5.0, location: 'Jakarta Pusat', comments: [] },
+            { id: 5, name: 'Wireless Gaming Headset Pro Blue', category: 'Elektronik', price: 890000, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', likes: 287, isLiked: false, rating: 4.8, location: 'Tangerang', comments: [] },
+            { id: 6, name: 'Backpack Urban Blue Waterproof', category: 'Aksesoris', price: 420000, image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80', likes: 124, isLiked: false, rating: 4.9, location: 'Semarang', comments: [] },
+            { id: 7, name: 'Mechanical Keyboard Blue Switch', category: 'Elektronik', price: 650000, image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=500&q=80', likes: 312, isLiked: false, rating: 4.8, location: 'Denpasar', comments: [] },
+            { id: 8, name: 'Tumblr Stainless Blue Edition', category: 'Aksesoris', price: 125000, image: 'https://images.unsplash.com/photo-1519750783826-e2420f4d687f?w=500&q=80', likes: 45, isLiked: false, rating: 4.6, location: 'Makassar', comments: [] },
+
+            // Alas Kaki (10 additional)
+            { id: 101, name: 'Sandal Gunung Outdoor Blue Ray', category: 'Alas Kaki', price: 210000, image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=500&q=80', likes: 88, isLiked: false, rating: 4.7, location: 'Bogor', comments: [] },
+            { id: 102, name: 'Sepatu Running Speed Blue', category: 'Alas Kaki', price: 540000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80', likes: 156, isLiked: false, rating: 4.8, location: 'Tangerang Selatan', comments: [] },
+            { id: 103, name: 'Sandal Casual Santai Deep Blue', category: 'Alas Kaki', price: 85000, image: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500&q=80', likes: 42, isLiked: false, rating: 4.5, location: 'Cirebon', comments: [] },
+            { id: 104, name: 'Sepatu Canvas Classic Navy', category: 'Alas Kaki', price: 275000, image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&q=80', likes: 120, isLiked: false, rating: 4.6, location: 'Bandung', comments: [] },
+            { id: 105, name: 'Formal Leather Shoes Ocean Dark', category: 'Alas Kaki', price: 780000, image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=500&q=80', likes: 65, isLiked: false, rating: 4.9, location: 'Jakarta Utara', comments: [] },
+            { id: 106, name: 'Sport Sandals Tech Blue', category: 'Alas Kaki', price: 320000, image: 'https://images.unsplash.com/photo-1603191659812-ee978eeeef76?w=500&q=80', likes: 94, isLiked: false, rating: 4.7, location: 'Medan', comments: [] },
+            { id: 107, name: 'Hiking Boots Trail Blue', category: 'Alas Kaki', price: 1100000, image: 'https://images.unsplash.com/photo-1608667508764-33cf0726b13a?w=500&q=80', likes: 210, isLiked: false, rating: 5.0, location: 'Malang', comments: [] },
+            { id: 108, name: 'Flat Shoes Office Blue', category: 'Alas Kaki', price: 195000, image: 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=500&q=80', likes: 38, isLiked: false, rating: 4.4, location: 'Semarang', comments: [] },
+            { id: 109, name: 'Kids Sport Shoes Blue Sky', category: 'Alas Kaki', price: 230000, image: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?w=500&q=80', likes: 55, isLiked: false, rating: 4.7, location: 'Solo', comments: [] },
+            { id: 110, name: 'Luxury Suede Loafers Royal Blue', category: 'Alas Kaki', price: 950000, image: 'https://images.unsplash.com/photo-1614252329302-53109a259c7b?w=500&q=80', likes: 72, isLiked: false, rating: 4.8, location: 'Jakarta Selatan', comments: [] },
+            { id: 111, name: 'Sepatu Basket Pro Infinity Blue', category: 'Alas Kaki', price: 1250000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80', likes: 210, isLiked: false, rating: 4.9, location: 'Surabaya', comments: [] },
+            { id: 112, name: 'Sandal Slide Comfort Navy', category: 'Alas Kaki', price: 75000, image: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500&q=80', likes: 45, isLiked: false, rating: 4.5, location: 'Solo', comments: [] },
+            { id: 113, name: 'Sepatu Slip-on Urban Blue', category: 'Alas Kaki', price: 320000, image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&q=80', likes: 88, isLiked: false, rating: 4.7, location: 'Bandung', comments: [] },
+            { id: 114, name: 'Sepatu Futsal Speed Strike Blue', category: 'Alas Kaki', price: 450000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80', likes: 134, isLiked: false, rating: 4.8, location: 'Semarang', comments: [] },
+            { id: 115, name: 'Sandal Flip-Flop Beach Blue', category: 'Alas Kaki', price: 45000, image: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500&q=80', likes: 22, isLiked: false, rating: 4.3, location: 'Bali', comments: [] },
+            { id: 116, name: 'Sepatu Boots Timber Blue', category: 'Alas Kaki', price: 1350000, image: 'https://images.unsplash.com/photo-1608667508764-33cf0726b13a?w=500&q=80', likes: 167, isLiked: false, rating: 5.0, location: 'Malang', comments: [] },
+            { id: 117, name: 'Sepatu Sneakers Retro Blue Wave', category: 'Alas Kaki', price: 680000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80', likes: 198, isLiked: false, rating: 4.9, location: 'Jakarta Barat', comments: [] },
+            { id: 118, name: 'Sandal Terapi Reflexology Blue', category: 'Alas Kaki', price: 120000, image: 'https://images.unsplash.com/photo-1603191659812-ee978eeeef76?w=500&q=80', likes: 56, isLiked: false, rating: 4.6, location: 'Yogyakarta', comments: [] },
+            { id: 119, name: 'Sepatu Lari Marathon Blue Pro', category: 'Alas Kaki', price: 890000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80', likes: 245, isLiked: false, rating: 4.9, location: 'Tangerang', comments: [] },
+            { id: 120, name: 'Sandal Kulit Tradisional Blue', category: 'Alas Kaki', price: 175000, image: 'https://images.unsplash.com/photo-1603808033192-082d6919d3e1?w=500&q=80', likes: 34, isLiked: false, rating: 4.4, location: 'Tasikmalaya', comments: [] },
+            { id: 121, name: 'Sepatu Tenis Court Blue', category: 'Alas Kaki', price: 520000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80', likes: 92, isLiked: false, rating: 4.7, location: 'Palembang', comments: [] },
+            { id: 122, name: 'Sepatu Casual High-Top Blue', category: 'Alas Kaki', price: 410000, image: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&q=80', likes: 115, isLiked: false, rating: 4.8, location: 'Medan', comments: [] },
+            { id: 123, name: 'Sandal Gunung Adventure Pro', category: 'Alas Kaki', price: 290000, image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=500&q=80', likes: 142, isLiked: false, rating: 4.9, location: 'Makassar', comments: [] },
+
+            // Fashion Pria (10 additional)
+            { id: 201, name: 'Kemeja Flanel Blue Grid Modern', category: 'Fashion Pria', price: 225000, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80', likes: 112, isLiked: false, rating: 4.7, location: 'Sukabumi', comments: [] },
+            { id: 202, name: 'Denim Jacket Classic Blue', category: 'Fashion Pria', price: 480000, image: 'https://images.unsplash.com/photo-1576905341935-4ef21b73cabb?w=500&q=80', likes: 345, isLiked: false, rating: 4.9, location: 'Pekalongan', comments: [] },
+            { id: 203, name: 'T-Shirt Oversize Blue Pastel', category: 'Fashion Pria', price: 120000, image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80', likes: 89, isLiked: false, rating: 4.6, location: 'Yogyakarta', comments: [] },
+            { id: 204, name: 'Chino Pants Slim Fit Navy', category: 'Fashion Pria', price: 295000, image: 'https://images.unsplash.com/photo-1473966968600-fa804b8682a3?w=500&q=80', likes: 134, isLiked: false, rating: 4.7, location: 'Tangerang', comments: [] },
+            { id: 205, name: 'Hoodie Fleece Cool Blue', category: 'Fashion Pria', price: 350000, image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80', likes: 256, isLiked: false, rating: 4.8, location: 'Bandung', comments: [] },
+            { id: 206, name: 'Sweater Knit Azure Comfort', category: 'Fashion Pria', price: 420000, image: 'https://images.unsplash.com/photo-1574167132757-12476fd27105?w=500&q=80', likes: 167, isLiked: false, rating: 4.8, location: 'Bogor', comments: [] },
+            { id: 207, name: 'Formal Blazer Midnight Blue', category: 'Fashion Pria', price: 1150000, image: 'https://images.unsplash.com/photo-1594931936711-30197f3fdf90?w=500&q=80', likes: 198, isLiked: false, rating: 5.0, location: 'Jakarta Barat', comments: [] },
+            { id: 208, name: 'Short Cargo Pants Ocean Blue', category: 'Fashion Pria', price: 185000, image: 'https://images.unsplash.com/photo-1617113948411-4fa2e022f462?w=500&q=80', likes: 67, isLiked: false, rating: 4.6, location: 'Palembang', comments: [] },
+            { id: 209, name: 'Vest Tactical Urban Blue', category: 'Fashion Pria', price: 310000, image: 'https://images.unsplash.com/photo-1614786482494-7fc579600df0?w=500&q=80', likes: 45, isLiked: false, rating: 4.5, location: 'Surakarta', comments: [] },
+            { id: 210, name: 'Leather Jacket Roadster Blue', category: 'Fashion Pria', price: 1450000, image: 'https://images.unsplash.com/photo-1520975954732-35dd2229969e?w=500&q=80', likes: 212, isLiked: false, rating: 4.9, location: 'Garut', comments: [] },
+            { id: 211, name: 'Celana Cargo Jogger Navy', category: 'Fashion Pria', price: 215000, image: 'https://images.unsplash.com/photo-1473966968600-fa804b8682a3?w=500&q=80', likes: 64, isLiked: false, rating: 4.6, location: 'Cimahi', comments: [] },
+            { id: 212, name: 'Kaus Polo Blue Stripe Classic', category: 'Fashion Pria', price: 165000, image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80', likes: 72, isLiked: false, rating: 4.5, location: 'Solo', comments: [] },
+            { id: 213, name: 'Jaket Bomber Blue Night', category: 'Fashion Pria', price: 540000, image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80', likes: 189, isLiked: false, rating: 4.8, location: 'Tangerang', comments: [] },
+            { id: 214, name: 'Kemeja Batik Modern Blue', category: 'Fashion Pria', price: 320000, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80', likes: 88, isLiked: false, rating: 4.7, location: 'Pekalongan', comments: [] },
+            { id: 215, name: 'Celana Jeans Slim Fit Denim', category: 'Fashion Pria', price: 385000, image: 'https://images.unsplash.com/photo-1576905341935-4ef21b73cabb?w=500&q=80', likes: 112, isLiked: false, rating: 4.8, location: 'Bandung', comments: [] },
+            { id: 216, name: 'Cardigan Knit Blue Ocean', category: 'Fashion Pria', price: 275000, image: 'https://images.unsplash.com/photo-1574167132757-12476fd27105?w=500&q=80', likes: 56, isLiked: false, rating: 4.6, location: 'Malang', comments: [] },
+            { id: 217, name: 'Suit Vest Royal Blue', category: 'Fashion Pria', price: 420000, image: 'https://images.unsplash.com/photo-1594931936711-30197f3fdf90?w=500&q=80', likes: 94, isLiked: false, rating: 4.9, location: 'Jakarta Selatan', comments: [] },
+            { id: 218, name: 'Kaus Raglan Blue Active', category: 'Fashion Pria', price: 145000, image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80', likes: 42, isLiked: false, rating: 4.5, location: 'Semarang', comments: [] },
+            { id: 219, name: 'Parka Jacket Blue Storm', category: 'Fashion Pria', price: 720000, image: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80', likes: 156, isLiked: false, rating: 4.9, location: 'Bogor', comments: [] },
+            { id: 220, name: 'Celana Pendek Chino Blue', category: 'Fashion Pria', price: 195000, image: 'https://images.unsplash.com/photo-1473966968600-fa804b8682a3?w=500&q=80', likes: 67, isLiked: false, rating: 4.6, location: 'Yogyakarta', comments: [] },
+            { id: 221, name: 'Sweatshirt Oversize Navy', category: 'Fashion Pria', price: 255000, image: 'https://images.unsplash.com/photo-1574167132757-12476fd27105?w=500&q=80', likes: 82, isLiked: false, rating: 4.7, location: 'Bandung', comments: [] },
+            { id: 222, name: 'Trench Coat Blue Formal', category: 'Fashion Pria', price: 1550000, image: 'https://images.unsplash.com/photo-1594931936711-30197f3fdf90?w=500&q=80', likes: 120, isLiked: false, rating: 5.0, location: 'Jakarta Pusat', comments: [] },
+            { id: 223, name: 'Sport Tee Quick Dry Blue', category: 'Fashion Pria', price: 115000, image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&q=80', likes: 45, isLiked: false, rating: 4.4, location: 'Tangerang', comments: [] },
+            { id: 224, name: 'Flannel Hoodie Blue Mix', category: 'Fashion Pria', price: 310000, image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80', likes: 77, isLiked: false, rating: 4.8, location: 'Surakarta', comments: [] },
+
+            // Elektronik (10 additional)
+            { id: 301, name: 'Smartwatch Gen 5 Ocean Blue', category: 'Elektronik', price: 1850000, image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80', likes: 342, isLiked: false, rating: 4.9, location: 'Jakarta Timur', comments: [] },
+            { id: 302, name: 'Bluetooth Speaker Bass Blue', category: 'Elektronik', price: 450000, image: 'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=500&q=80', likes: 123, isLiked: false, rating: 4.7, location: 'Batam', comments: [] },
+            { id: 303, name: 'Powerbank 20000mAh Blue Flash', category: 'Elektronik', price: 350000, image: 'https://images.unsplash.com/photo-1620288627223-53302f4e8c74?w=500&q=80', likes: 88, isLiked: false, rating: 4.6, location: 'Depok', comments: [] },
+            { id: 304, name: 'LED Monitor 24 Inch Curved Blue', category: 'Elektronik', price: 2100000, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80', likes: 456, isLiked: false, rating: 5.0, location: 'Surabaya', comments: [] },
+            { id: 305, name: 'Laptop Pro Slim Azure Edition', category: 'Elektronik', price: 12500000, image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80', likes: 890, isLiked: false, rating: 4.9, location: 'Jakarta Selatan', comments: [] },
+            { id: 306, name: 'RGB Gaming Mouse Blue Neon', category: 'Elektronik', price: 275000, image: 'https://images.unsplash.com/photo-1527443195645-1133e772b0cf?w=500&q=80', likes: 167, isLiked: false, rating: 4.8, location: 'Tangerang', comments: [] },
+            { id: 307, name: 'External SSD 1TB Speed Blue', category: 'Elektronik', price: 1450000, image: 'https://images.unsplash.com/photo-1628151015626-3c20edaf2f24?w=500&q=80', likes: 312, isLiked: false, rating: 4.9, location: 'Bekasi', comments: [] },
+            { id: 308, name: 'Webcam HD 1080p Clear Blue', category: 'Elektronik', price: 620000, image: 'https://images.unsplash.com/photo-1587841535490-482f7035f29d?w=500&q=80', likes: 74, isLiked: false, rating: 4.7, location: 'Padang', comments: [] },
+            { id: 309, name: 'Table Lamp LED Smart Blue', category: 'Elektronik', price: 195000, image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500&q=80', likes: 56, isLiked: false, rating: 4.5, location: 'Malang', comments: [] },
+            { id: 310, name: 'Tablet Drawing Digital Blue Pen', category: 'Elektronik', price: 3400000, image: 'https://images.unsplash.com/photo-1542744095-2ad4870f6711?w=500&q=80', likes: 198, isLiked: false, rating: 4.8, location: 'Jakarta Utara', comments: [] },
+            { id: 311, name: 'TWS Earbuds Pro Blue Deep', category: 'Elektronik', price: 650000, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', likes: 212, isLiked: false, rating: 4.9, location: 'Tangerang', comments: [] },
+            { id: 312, name: 'Action Cam 4K Blue Shield', category: 'Elektronik', price: 2150000, image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80', likes: 89, isLiked: false, rating: 4.7, location: 'Batam', comments: [] },
+            { id: 313, name: 'Mechanical Keyboard 60% Blue', category: 'Elektronik', price: 780000, image: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=500&q=80', likes: 145, isLiked: false, rating: 4.8, location: 'Surabaya', comments: [] },
+            { id: 314, name: 'Router WiFi 6 Gaming Blue', category: 'Elektronik', price: 1250000, image: 'https://images.unsplash.com/photo-1620288627223-53302f4e8c74?w=500&q=80', likes: 67, isLiked: false, rating: 4.6, location: 'Depok', comments: [] },
+            { id: 315, name: 'Smart Home Hub Glow Blue', category: 'Elektronik', price: 890000, image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80', likes: 120, isLiked: false, rating: 4.7, location: 'Jakarta Selatan', comments: [] },
+            { id: 316, name: 'Noise Cancelling Headphone Navy', category: 'Elektronik', price: 3500000, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80', likes: 432, isLiked: false, rating: 5.0, location: 'Bandung', comments: [] },
+            { id: 317, name: 'Portable Projector Mini Blue', category: 'Elektronik', price: 2750000, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80', likes: 156, isLiked: false, rating: 4.8, location: 'Semarang', comments: [] },
+            { id: 318, name: 'Digital Camera Mirrorless Blue', category: 'Elektronik', price: 8900000, image: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80', likes: 278, isLiked: false, rating: 4.9, location: 'Malang', comments: [] },
+            { id: 319, name: 'Smart Fan Tower Blue Breeze', category: 'Elektronik', price: 1250000, image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500&q=80', likes: 82, isLiked: false, rating: 4.6, location: 'Yogyakarta', comments: [] },
+            { id: 320, name: 'Electric Kettle Smart Blue', category: 'Elektronik', price: 450000, image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500&q=80', likes: 54, isLiked: false, rating: 4.5, location: 'Surakarta', comments: [] },
+            { id: 321, name: 'Gaming Controller Wireless Blue', category: 'Elektronik', price: 850000, image: 'https://images.unsplash.com/photo-1527443195645-1133e772b0cf?w=500&q=80', likes: 198, isLiked: false, rating: 4.9, location: 'Jakarta Barat', comments: [] },
+            { id: 322, name: 'Smart Bulb RGB Blue Aura', category: 'Elektronik', price: 125000, image: 'https://images.unsplash.com/photo-1534073828943-f801091bb18c?w=500&q=80', likes: 112, isLiked: false, rating: 4.7, location: 'Bekasi', comments: [] },
+            { id: 323, name: 'Portable Monitor 1080p Blue', category: 'Elektronik', price: 1850000, image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=500&q=80', likes: 67, isLiked: false, rating: 4.6, location: 'Padang', comments: [] },
+
+            // Aksesoris (10 additional)
+            { id: 401, name: 'Kacamata Hitam Blue Lens Polarized', category: 'Aksesoris', price: 175000, image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80', likes: 145, isLiked: false, rating: 4.7, location: 'Samarinda', comments: [] },
+            { id: 402, name: 'Dompet Kulit Pria Navy Premium', category: 'Aksesoris', price: 245000, image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80', likes: 211, isLiked: false, rating: 4.8, location: 'Pontianak', comments: [] },
+            { id: 403, name: 'Gantungan Kunci Blue Gemstone', category: 'Aksesoris', price: 45000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80', likes: 32, isLiked: false, rating: 4.4, location: 'Mataram', comments: [] },
+            { id: 404, name: 'Topi Snapback Urban Blue', category: 'Aksesoris', price: 110000, image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&q=80', likes: 78, isLiked: false, rating: 4.6, location: 'Banjarmasin', comments: [] },
+            { id: 405, name: 'Gelang Paracord Blue Adventure', category: 'Aksesoris', price: 35000, image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1520a?w=500&q=80', likes: 54, isLiked: false, rating: 4.5, location: 'Manado', comments: [] },
+            { id: 406, name: 'Sabuk Kulit Automatic Buckle Blue', category: 'Aksesoris', price: 195000, image: 'https://images.unsplash.com/photo-1624222247344-550fbadec946?w=500&q=80', likes: 92, isLiked: false, rating: 4.7, location: 'Balikpapan', comments: [] },
+            { id: 407, name: 'Scarf Soft Wool Azure', category: 'Aksesoris', price: 125000, image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=500&q=80', likes: 67, isLiked: false, rating: 4.6, location: 'Bandung', comments: [] },
+            { id: 408, name: 'Card Holder Metalic Blue', category: 'Aksesoris', price: 85000, image: 'https://images.unsplash.com/photo-1628151012975-d143c7b80894?w=500&q=80', likes: 41, isLiked: false, rating: 4.5, location: 'Tegal', comments: [] },
+            { id: 409, name: 'Sling Bag Mini Ocean Blue', category: 'Aksesoris', price: 165000, image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&q=80', likes: 110, isLiked: false, rating: 4.7, location: 'Jember', comments: [] },
+            { id: 410, name: 'Umbrella Travel Blue Windproof', category: 'Aksesoris', price: 95000, image: 'https://images.unsplash.com/photo-1574485121908-ccf4139886b6?w=500&q=80', likes: 53, isLiked: false, rating: 4.5, location: 'Balaraja', comments: [] },
+            { id: 411, name: 'Kacamata Anti-Blue Pro', category: 'Aksesoris', price: 185000, image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80', likes: 112, isLiked: false, rating: 4.8, location: 'Jakarta Pusat', comments: [] },
+            { id: 412, name: 'Cincin Titanium Ocean Blue', category: 'Aksesoris', price: 275000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80', likes: 45, isLiked: false, rating: 4.6, location: 'Surabaya', comments: [] },
+            { id: 413, name: 'Gelang Tali Nautical Blue', category: 'Aksesoris', price: 35000, image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1520a?w=500&q=80', likes: 32, isLiked: false, rating: 4.5, location: 'Bali', comments: [] },
+            { id: 414, name: 'Dompet Kartu Slim Navy', category: 'Aksesoris', price: 125000, image: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80', likes: 67, isLiked: false, rating: 4.7, location: 'Tangerang', comments: [] },
+            { id: 415, name: 'Kalung Pendant Azure Sky', category: 'Aksesoris', price: 195000, image: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80', likes: 14, isLiked: false, rating: 4.3, location: 'Bandung', comments: [] },
+            { id: 416, name: 'Topi Beanie Soft Navy', category: 'Aksesoris', price: 85000, image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&q=80', likes: 56, isLiked: false, rating: 4.6, location: 'Malang', comments: [] },
+            { id: 417, name: 'Sling Bag Mini Royal Blue', category: 'Aksesoris', price: 210000, image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=500&q=80', likes: 98, isLiked: false, rating: 4.8, location: 'Semarang', comments: [] },
+            { id: 418, name: 'Ikat Belat Canvas Blue Active', category: 'Aksesoris', price: 65000, image: 'https://images.unsplash.com/photo-1624222247344-550fbadec946?w=500&q=80', likes: 42, isLiked: false, rating: 4.5, location: 'Yogyakarta', comments: [] },
+            { id: 419, name: 'Syal Satin Ocean Wave', category: 'Aksesoris', price: 145000, image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=500&q=80', likes: 21, isLiked: false, rating: 4.4, location: 'Cirebon', comments: [] },
+            { id: 420, name: 'Phone Strap Beaded Blue', category: 'Aksesoris', price: 30000, image: 'https://images.unsplash.com/photo-1628151012975-d143c7b80894?w=500&q=80', likes: 12, isLiked: false, rating: 4.1, location: 'Bogor', comments: [] },
+            { id: 421, name: 'Keychain Leather Blue Craft', category: 'Aksesoris', price: 55000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80', likes: 15, isLiked: false, rating: 4.2, location: 'Solo', comments: [] },
+            { id: 422, name: 'Bros Hijab Crystal Blue', category: 'Aksesoris', price: 45000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80', likes: 9, isLiked: false, rating: 4.0, location: 'Tasikmalaya', comments: [] },
+            { id: 423, name: 'Earring Drop Sapphire Imitation', category: 'Aksesoris', price: 95000, image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=500&q=80', likes: 24, isLiked: false, rating: 4.5, location: 'Denpasar', comments: [] },
+            { id: 424, name: 'Badge Pin Together Blue', category: 'Aksesoris', price: 15000, image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=500&q=80', likes: 38, isLiked: false, rating: 4.7, location: 'Banjarmasin', comments: [] },
+            { id: 425, name: 'Neck Gaiter Outdoor Blue', category: 'Aksesoris', price: 40000, image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=500&q=80', likes: 52, isLiked: false, rating: 4.6, location: 'Garut', comments: [] }
+        ];
+
+        let currentProduct = null;
+        let pendingCommentImage = null; // Stores Base64 for main comment
+        let pendingReplyImage = null;   // Stores Base64 for replies
+
+        function getIndonesianTimestamp() {
+            const now = new Date();
+            const options = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            };
+            const formatter = new Intl.DateTimeFormat('id-ID', options);
+            return formatter.format(now) + ' WIB';
+        }
+
+        function loadProductsState() {
+            const savedState = localStorage.getItem('togetherStoreProducts');
+            if (savedState) {
+                try {
+                    products = JSON.parse(savedState);
+                } catch (e) {
+                    console.error('Failed to parse products state', e);
+                }
+            }
+        }
+
+        function saveProductsState() {
+            localStorage.setItem('togetherStoreProducts', JSON.stringify(products));
+        }
+
+        // Image Attachment System
+        function handleImageSelect(event, previewContainerId) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) { // 2MB limit for localStorage sanity
+                alert("Ukuran gambar terlalu besar. Maksimal 2MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const base64Data = e.target.result;
+                if (previewContainerId === 'commentUploadPreview') {
+                    pendingCommentImage = base64Data;
+                } else {
+                    pendingReplyImage = base64Data;
+                }
+                renderImagePreview(base64Data, previewContainerId);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderImagePreview(base64, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="preview-img-wrapper">
+                    <img src="${base64}" class="preview-img">
+                    <button class="remove-preview" onclick="removeImagePreview('${containerId}')">×</button>
+                </div>
+            `;
+        }
+
+        function removeImagePreview(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+            if (containerId === 'commentUploadPreview') {
+                pendingCommentImage = null;
+                document.getElementById('commentImageInput').value = '';
+            } else {
+                pendingReplyImage = null;
+                const activeId = activeReplyCommentId;
+                if (activeId) {
+                    const input = document.getElementById(`replyImageInput-${activeId}`);
+                    if (input) input.value = '';
+                }
+            }
+        }
+
+        let activeCategory = 'Semua Produk';
+
+        function initStore(filterCategory = 'Semua Produk') {
+            activeCategory = filterCategory;
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = '';
+
+            const filtered = filterCategory === 'Semua Produk'
+                ? products
+                : products.filter(p => p.category === filterCategory);
+
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <div class="product-img-wrapper">
+                        <img src="${p.image}" class="product-img" onerror="this.src='https://placehold.co/400x400/0056b3/white?text=Together+Store'">
+                    </div>
+                    <div class="product-info">
+                        <h4 class="product-name">${p.name}</h4>
+                        <div class="product-price-row">
+                            <div class="product-price">Rp ${p.price.toLocaleString('id-ID')}</div>
+                            <div class="product-card-likes"><i class="fas fa-heart"></i> ${p.likes}</div>
+                        </div>
+                        <div class="product-meta">
+                            <span class="product-rating"><i class="fas fa-star"></i> ${p.rating}</span>
+                            <span class="product-location"><i class="fas fa-map-marker-alt"></i> ${p.location}</span>
+                        </div>
+                    </div>
+                `;
+                card.onclick = () => showDetail(p.id);
+                grid.appendChild(card);
+            });
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(view + 'View').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function showDetail(id) {
+            currentProduct = products.find(p => p.id === id);
+            renderDetail();
+            renderComments();
+            switchView('productDetail');
+        }
+
+        function renderDetail() {
+            document.getElementById('detailContent').innerHTML = `
+                <div class="detail-wrapper">
+                    <div class="detail-img-container">
+                        <img src="${currentProduct.image}" class="detail-img" onerror="this.src='https://placehold.co/600x600/0056b3/white?text=Toko+Together'">
+                    </div>
+                    <div class="detail-info">
+                        <div class="detail-header">
+                            <h1>${currentProduct.name}</h1>
+                            <div class="like-btn-big ${currentProduct.isLiked ? 'active' : ''}" onclick="toggleLike(${currentProduct.id})">
+                                <i class="${currentProduct.isLiked ? 'fas' : 'far'} fa-heart"></i> 
+                                <span id="likeCountDetail">${currentProduct.likes}</span>
+                            </div>
+                        </div>
+                        <div class="price-section">
+                            <span class="product-price" style="font-size:2.8rem;">Rp ${currentProduct.price.toLocaleString('id-ID')}</span>
+                            <div style="display:flex; gap:15px; margin-top:8px;">
+                                <span style="color:#f59e0b; font-weight:700;"><i class="fas fa-star"></i> ${currentProduct.rating}</span>
+                                <span style="color:var(--text-muted);"><i class="fas fa-map-marker-alt"></i> ${currentProduct.location}</span>
+                            </div>
+                            <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;"><i class="fas fa-shield-alt"></i> Garansi Resmi Together Store 1 Tahun</p>
+                        </div>
+                        <div style="margin-bottom:30px;">
+                            <h4 style="margin-bottom:10px;">Deskripsi Produk</h4>
+                            <p style="color:#555; font-size:1.05rem; line-height:1.7;">Produk Blue Edition khusus dari Together Store. Menggunakan material pilihan terbaik dengan finishing warna biru premium yang tahan lama. Cocok untuk penggunaan sehari-hari maupun koleksi eksklusif.</p>
+                        </div>
+                        <div class="detail-actions">
+                            <button class="btn btn-primary" onclick="showCheckout()">Beli Langsung</button>
+                            <button class="btn btn-outline" style="flex:0.3;"><i class="fas fa-shopping-cart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleLike(id) {
+            const p = products.find(prod => prod.id === id);
+            p.isLiked = !p.isLiked;
+            p.likes += p.isLiked ? 1 : -1;
+            saveProductsState();
+            renderDetail();
+            initStore();
+        }
+
+        // Simplified Comment System
+        function postComment() {
+            const input = document.getElementById('commentInput');
+            if (!input.value.trim() && !pendingCommentImage) return;
+
+            const commenterName = isLoggedIn && currentUserData ? currentUserData.name : 'User Together';
+            const commenterAvatar = isLoggedIn && currentUserData ? currentUserData.avatar : null;
+            const commenterEmail = isLoggedIn && currentUserData ? currentUserData.email : 'guest'; // For ownership tracking
+
+            currentProduct.comments.unshift({
+                id: Date.now(),
+                user: commenterName,
+                avatar: commenterAvatar,
+                email: commenterEmail,
+                text: input.value,
+                image: pendingCommentImage, // Attach image
+                likes: 0,
+                isLiked: false,
+                time: getIndonesianTimestamp(),
+                replies: []
+            });
+            input.value = '';
+            removeImagePreview('commentUploadPreview'); // Clear preview and state
+            saveProductsState();
+            renderComments();
+        }
+
+        function renderComments() {
+            const list = document.getElementById('commentList');
+            document.getElementById('commentCount').innerText = `Komentar Pembeli (${currentProduct.comments.length})`;
+            list.innerHTML = '';
+
+            // Update Input Placeholder Avatar
+            const inputAvatar = document.querySelector('.comment-input-area .comment-avatar');
+            if (inputAvatar) {
+                if (isLoggedIn && currentUserData) {
+                    inputAvatar.outerHTML = `<img src="${currentUserData.avatar}" class="comment-avatar" style="width: 45px; height: 45px; border-radius: 50%;">`;
+                } else {
+                    inputAvatar.outerHTML = `<div class="comment-avatar">UT</div>`;
+                }
+            }
+
+            if (currentProduct.comments.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:60px; color:#aaa;"><i class="far fa-comments" style="font-size:3rem; margin-bottom:15px; display:block;"></i>Belum ada ulasan untuk produk ini.</div>';
+                return;
+            }
+
+            currentProduct.comments.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'comment-item';
+                item.style.flexDirection = 'column';
+
+                const avatarImg = c.avatar ? `<img src="${c.avatar}" class="comment-avatar" style="width: 45px; height: 45px; border-radius: 50%;">` : `<img src="https://ui-avatars.com/api/?name=${c.user}&background=0056b3&color=fff" class="comment-avatar">`;
+
+                // Show delete button only if logged in AND the comment's email matches the current user's email
+                let deleteActionHtml = '';
+                if (isLoggedIn && currentUserData && c.email === currentUserData.email) {
+                    deleteActionHtml = `<div class="comment-action" onclick="deleteComment(${c.id})"><i class="fas fa-trash-alt"></i> Hapus</div>`;
+                }
+
+                let replyActionHtml = `<div class="comment-action" onclick="showReplyInput(${c.id})"><i class="fas fa-reply"></i> Balas</div>`;
+
+                let commentBody = `
+                    <div style="display:flex; gap:20px; width: 100%;">
+                        ${avatarImg}
+                        <div class="comment-content">
+                            <div class="comment-name">${c.user} <span style="font-weight:400; color:#ccc; float:right; font-size:0.75rem;">${c.time}</span></div>
+                            <div class="comment-text">${c.text}</div>
+                            ${c.image ? `<div class="comment-image-attachment" onclick="window.open('${c.image}', '_blank')"><img src="${c.image}"></div>` : ''}
+                            <div class="comment-actions">
+                                <div class="comment-action ${c.isLiked ? 'like active' : 'like'}" onclick="toggleCommentLike(${c.id})"><i class="fas fa-heart"></i> ${c.likes}</div>
+                                ${replyActionHtml}
+                                ${deleteActionHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Render Replies
+                let repliesHtml = '';
+                const replies = c.replies || [];
+                if (replies.length > 0) {
+                    repliesHtml = `<div class="comment-replies">`;
+                    replies.forEach(r => {
+                        const rAvatarImg = r.avatar ? `<img src="${r.avatar}" class="comment-avatar" style="width: 35px; height: 35px; border-radius: 50%;">` : `<img src="https://ui-avatars.com/api/?name=${r.user}&background=0056b3&color=fff" class="comment-avatar">`;
+
+                        let rDeleteActionHtml = '';
+                        if (isLoggedIn && currentUserData && r.email === currentUserData.email) {
+                            rDeleteActionHtml = `<div class="comment-action" onclick="deleteReply(${c.id}, ${r.id})"><i class="fas fa-trash-alt"></i> Hapus</div>`;
+                        }
+
+                        repliesHtml += `
+                            <div class="comment-reply-item">
+                                ${rAvatarImg}
+                                <div class="comment-content" style="background:#fcfcfc;">
+                                    <div class="comment-name" style="font-size:0.85rem;">${r.user} <span style="font-weight:400; color:#ccc; float:right; font-size:0.7rem;">${r.time}</span></div>
+                                    <div class="comment-text" style="font-size:0.9rem;">${r.text}</div>
+                                    ${r.image ? `<div class="comment-image-attachment" onclick="window.open('${r.image}', '_blank')"><img src="${r.image}" style="max-width: 200px;"></div>` : ''}
+                                    <div class="comment-actions" style="margin-top:8px;">
+                                        <div class="comment-action ${r.isLiked ? 'like active' : 'like'}" onclick="toggleReplyLike(${c.id}, ${r.id})"><i class="fas fa-heart"></i> ${r.likes}</div>
+                                        ${rDeleteActionHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    repliesHtml += `</div>`;
+                }
+
+                commentBody += repliesHtml;
+                commentBody += `<div id="reply-container-${c.id}"></div>`; // Placeholder for active reply input
+
+                item.innerHTML = commentBody;
+                list.appendChild(item);
+            });
+        }
+
+        let activeReplyCommentId = null;
+
+        function showReplyInput(commentId) {
+            // Close any existing open reply boxes
+            if (activeReplyCommentId !== null) {
+                const oldContainer = document.getElementById(`reply-container-${activeReplyCommentId}`);
+                if (oldContainer) oldContainer.innerHTML = '';
+            }
+
+            activeReplyCommentId = commentId;
+            const container = document.getElementById(`reply-container-${commentId}`);
+            if (!container) return;
+
+            // Determine avatar for reply input
+            let inputAvatarHtml = `<div class="comment-avatar" style="width:35px; height:35px; display:flex; align-items:center; justify-content:center; background:#0056b3; color:white; border-radius:50%; font-size:12px;">UT</div>`;
+            if (isLoggedIn && currentUserData) {
+                inputAvatarHtml = `<img src="${currentUserData.avatar}" class="comment-avatar" style="width: 35px; height: 35px; border-radius: 50%;">`;
+            }
+
+            container.innerHTML = `
+                <div class="reply-input-wrapper">
+                    ${inputAvatarHtml}
+                    <div class="reply-input-box" style="position:relative; flex-wrap: wrap; padding-bottom: 40px;">
+                        <input type="text" id="replyInput-${commentId}" placeholder="Tulis balasan..." onkeypress="if(event.key==='Enter') postReply(${commentId})" style="width: 100%;">
+                        
+                        <div id="replyUploadPreview-${commentId}" class="upload-preview-container" style="width: 100%;"></div>
+
+                        <input type="file" id="replyImageInput-${commentId}" style="display: none;" accept="image/*" onchange="handleImageSelect(event, 'replyUploadPreview-${commentId}')">
+                        
+                        <button class="upload-btn" onclick="document.getElementById('replyImageInput-${commentId}').click()" title="Tambah Gambar" style="right: 50px; bottom: 5px; width: 30px; height: 30px;">
+                            <i class="fas fa-image" style="font-size: 0.9rem;"></i>
+                        </button>
+                        <button class="reply-send-btn" onclick="postReply(${commentId})" style="position:absolute; right:10px; bottom:5px;"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            `;
+
+            // Focus the input
+            setTimeout(() => {
+                document.getElementById(`replyInput-${commentId}`).focus();
+            }, 50);
+        }
+
+        function postReply(commentId) {
+            const input = document.getElementById(`replyInput-${commentId}`);
+            if (!input || (!input.value.trim() && !pendingReplyImage)) return;
+
+            const c = currentProduct.comments.find(comm => comm.id === commentId);
+            if (!c) return;
+
+            if (!c.replies) c.replies = [];
+
+            const replierName = isLoggedIn && currentUserData ? currentUserData.name : 'User Together';
+            const replierAvatar = isLoggedIn && currentUserData ? currentUserData.avatar : null;
+            const replierEmail = isLoggedIn && currentUserData ? currentUserData.email : 'guest';
+
+            c.replies.push({
+                id: Date.now(),
+                user: replierName,
+                avatar: replierAvatar,
+                email: replierEmail,
+                text: input.value,
+                image: pendingReplyImage, // Attach image
+                likes: 0,
+                isLiked: false,
+                time: getIndonesianTimestamp()
+            });
+
+            activeReplyCommentId = null;
+            pendingReplyImage = null; // Clear state
+            saveProductsState();
+            renderComments();
+        }
+
+        function toggleReplyLike(commentId, replyId) {
+            const c = currentProduct.comments.find(comm => comm.id === commentId);
+            if (!c || !c.replies) return;
+
+            const r = c.replies.find(rep => rep.id === replyId);
+            if (!r) return;
+
+            r.isLiked = !r.isLiked;
+            r.likes += r.isLiked ? 1 : -1;
+            saveProductsState();
+            renderComments();
+        }
+
+        function deleteReply(commentId, replyId) {
+            const c = currentProduct.comments.find(comm => comm.id === commentId);
+            if (!c || !c.replies) return;
+
+            const r = c.replies.find(rep => rep.id === replyId);
+            if (!isLoggedIn || !currentUserData || !r || r.email !== currentUserData.email) {
+                alert("Anda tidak memiliki izin untuk menghapus balasan ini.");
+                return;
+            }
+
+            c.replies = c.replies.filter(rep => rep.id !== replyId);
+            saveProductsState();
+            renderComments();
+        }
+
+        function toggleCommentLike(id) {
+            const c = currentProduct.comments.find(comm => comm.id === id);
+            c.isLiked = !c.isLiked;
+            c.likes += c.isLiked ? 1 : -1;
+            saveProductsState();
+            renderComments();
+        }
+
+        function deleteComment(id) {
+            // Re-verify ownership defensively before deletion
+            const c = currentProduct.comments.find(comm => comm.id === id);
+            if (!isLoggedIn || !currentUserData || !c || c.email !== currentUserData.email) {
+                alert("Anda tidak memiliki izin untuk menghapus komentar ini.");
+                return;
+            }
+
+            currentProduct.comments = currentProduct.comments.filter(comm => comm.id !== id);
+            saveProductsState();
+            renderComments();
+        }
+
+        // Checkout System
+        let checkoutQty = 1;
+
+        function showCheckout() {
+            if (!currentProduct) return;
+            checkoutQty = 1;
+            renderCheckoutProduct();
+            switchView('checkout');
+
+            // Payment selection handler
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            const paymentRadios = document.querySelectorAll('input[name="payment"]');
+
+            paymentRadios.forEach(radio => {
+                radio.onchange = function () {
+                    paymentOptions.forEach(opt => opt.classList.remove('selected'));
+                    if (this.checked) {
+                        this.closest('.payment-option').classList.add('selected');
+                    }
+                };
+            });
+
+            // Allow keyboard selection via click on label
+            paymentOptions.forEach(opt => {
+                opt.onclick = function () {
+                    const radio = this.querySelector('input');
+                    radio.checked = true;
+                    paymentRadios.forEach(r => { if (r !== radio) r.onchange && r.onchange() }); // trigger changes if needed
+                    radio.onchange(); // Trigger the style change
+                };
+            });
+        }
+
+        function updateQty(change) {
+            let newQty = checkoutQty + change;
+            if (newQty < 1) newQty = 1;
+            if (newQty > 10) newQty = 10;
+
+            checkoutQty = newQty;
+            document.getElementById('checkoutQtyInput').value = checkoutQty;
+            updateCheckoutTotal();
+        }
+
+        function updateCheckoutTotal() {
+            const total = currentProduct.price * checkoutQty;
+            document.getElementById('checkoutTotalPrice').innerText = 'IDR ' + total.toLocaleString('id-ID');
+        }
+
+        function renderCheckoutProduct() {
+            const detailsHtml = `
+                <img src="${currentProduct.image}" alt="${currentProduct.name}" onerror="this.src='https://placehold.co/400x400/0056b3/white?text=Store'">
+                <div class="checkout-product-info">
+                    <div class="checkout-product-name">${currentProduct.name}</div>
+                    <div class="checkout-price-qty">
+                        <div class="checkout-price">Rp ${currentProduct.price.toLocaleString('id-ID')}</div>
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="updateQty(-1)">-</button>
+                            <input type="text" class="qty-input" id="checkoutQtyInput" value="${checkoutQty}" readonly>
+                            <button class="qty-btn" onclick="updateQty(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('checkoutProductDetails').innerHTML = detailsHtml;
+            updateCheckoutTotal();
+        }
+
+        function getWIBTimestamp() {
+            const now = new Date();
+
+            // Convert to WIB (UTC+7)
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const wibTime = new Date(utc + (3600000 * 7));
+
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const day = String(wibTime.getDate()).padStart(2, '0');
+            const month = months[wibTime.getMonth()];
+            const year = wibTime.getFullYear();
+
+            const hours = String(wibTime.getHours()).padStart(2, '0');
+            const minutes = String(wibTime.getMinutes()).padStart(2, '0');
+
+            return `${day} ${month} ${year}, ${hours}:${minutes} WIB`;
+        }
+
+        function placeOrder() {
+            const selectedPayment = document.querySelector('input[name="payment"]:checked');
+            const paymentName = selectedPayment ? selectedPayment.value : 'Unknown';
+            const total = currentProduct.price * checkoutQty;
+
+            // Populate Receipt Data
+            document.getElementById('receiptDate').innerText = getWIBTimestamp();
+            document.getElementById('receiptTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            document.getElementById('receiptMethod').innerText = paymentName;
+            document.getElementById('receiptId').innerText = 'TRX-' + Math.floor(100000 + Math.random() * 900000);
+
+            document.getElementById('receiptImg').src = currentProduct.image;
+            document.getElementById('receiptName').innerText = currentProduct.name;
+            document.getElementById('receiptQty').innerText = checkoutQty;
+
+            // Show Receipt View
+            switchView('receipt');
+        }
+
+        // Login & Profile System
+        let currentLoginMethod = 'Email';
+        let isLoggedIn = false;
+        let currentUserData = null;
+
+        function handleProfileClick() {
+            if (isLoggedIn) {
+                toggleProfileDropdown();
+            } else {
+                openLoginModal();
+            }
+        }
+
+        function toggleProfileDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('profileDropdown');
+            const profileIcon = document.getElementById('userProfileIcon');
+            if (isLoggedIn && dropdown && dropdown.classList.contains('active')) {
+                if (!dropdown.contains(event.target) && !profileIcon.contains(event.target)) {
+                    dropdown.classList.remove('active');
+                }
+            }
+        });
+
+        function openLoginModal() {
+            document.getElementById('customLoginModal').classList.add('active');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('customLoginModal').classList.remove('active');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('loginFormArea').style.display = 'none'; // reset form visibility
+        }
+
+        function selectLoginMethod(method) {
+            currentLoginMethod = method;
+            document.getElementById('loginMethodLabel').innerText = `MELANJUTKAN DENGAN ${method.toUpperCase()}`;
+            document.getElementById('loginFormArea').style.display = 'block';
+            document.getElementById('loginEmail').focus();
+        }
+
+        function submitLogin() {
+            const emailInput = document.getElementById('loginEmail').value;
+            if (!emailInput) return; // browser required handles empty
+
+            const userDisplay = emailInput.split('@')[0];
+            const avatarUrl = `https://ui-avatars.com/api/?name=${userDisplay}&background=00c6ff&color=fff`;
+
+            // State Update
+            isLoggedIn = true;
+            currentUserData = {
+                name: userDisplay,
+                email: emailInput,
+                avatar: avatarUrl
+            };
+
+            // Save to LocalStorage
+            localStorage.setItem('togetherStoreSession', JSON.stringify(currentUserData));
+
+            alert(`Proses masuk melalui ${currentLoginMethod} berhasil!\n\nSelamat datang kembali, ${userDisplay}.`);
+
+            applyLoggedInState();
+            closeLoginModal();
+        }
+
+        function applyLoggedInState() {
+            if (!currentUserData) return;
+
+            // Update Navbar Icon to show logged in state
+            document.getElementById('userProfileIcon').innerHTML = `
+                <img src="${currentUserData.avatar}" 
+                     style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            `;
+
+            // Populate Dropdown
+            document.getElementById('dropdownAvatar').src = currentUserData.avatar;
+            document.getElementById('dropdownName').innerText = currentUserData.name;
+            document.getElementById('dropdownEmail').innerText = currentUserData.email;
+        }
+
+        function checkLoginStatus() {
+            const savedSession = localStorage.getItem('togetherStoreSession');
+            if (savedSession) {
+                try {
+                    currentUserData = JSON.parse(savedSession);
+                    isLoggedIn = true;
+                    applyLoggedInState();
+                } catch (e) {
+                    console.error('Failed to parse session data', e);
+                    localStorage.removeItem('togetherStoreSession');
+                }
+            }
+        }
+
+        function logout() {
+            // Reset State
+            isLoggedIn = false;
+            currentUserData = null;
+            localStorage.removeItem('togetherStoreSession');
+
+            // Reset UI
+            document.getElementById('userProfileIcon').innerHTML = `<i class="fas fa-user-circle" style="font-size: 1.5rem;"></i>`;
+            document.getElementById('profileDropdown').classList.remove('active');
+
+            // Re-render product detail if open to update comment input/buttons visually
+            if (currentProduct && document.getElementById('productDetailView').classList.contains('active')) {
+                renderComments();
+            }
+
+            alert('Anda telah berhasil keluar (Log Out).');
+        }
+
+        function filterByCategory(category) {
+            initStore(category);
+
+            // Sync Toggle Checkboxes
+            const checkboxes = document.querySelectorAll('.filter-content label input');
+            checkboxes.forEach(chk => {
+                const labelText = chk.parentElement.textContent.trim();
+                chk.checked = (labelText === category);
+            });
+        }
+
+        loadProductsState();
+        initStore();
+        checkLoginStatus();
+    </script>
+</body>
+
+</html>
